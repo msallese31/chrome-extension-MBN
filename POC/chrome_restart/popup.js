@@ -57,7 +57,7 @@ function getCurrentTabUrl(callback) {
 function getImageUrl(searchTerm, callback, errorCallback) {
   // Google image search - 100 searches per day.
   // https://developers.google.com/image-search/
-  var searchUrl = 'http://127.0.0.1:5000/getspeechtotext';
+  var searchUrl = 'http://127.0.0.1:8000/getspeechtotext';
   var x = new XMLHttpRequest();
   x.open('GET', searchUrl);
   // The Google image search API responds with JSON, so let Chrome parse it.
