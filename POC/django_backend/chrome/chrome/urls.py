@@ -17,6 +17,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^getspeechtotext/', include('video_process.urls')),
+    url(r'^video_process/', include('video_process.urls')),
     url(r'^admin/', admin.site.urls),
 ]
