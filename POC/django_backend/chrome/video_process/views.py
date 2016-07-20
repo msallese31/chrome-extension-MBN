@@ -5,12 +5,15 @@ import json
 import youtube_dl
 import requests
 import wave
+import os
 
-url = 'https://stream.watsonplatform.net/speech-to-text/api/v1/recognize'
+url = 'https://stream.watsonplatform.net/speech-to-text/api/v1/recognize?continuous=true'
 username = '040c9c9a-791a-4a22-9989-d1c891148d96'
 password = 'NNmNJPOAqdsU'
 
-headers={'content-type': 'audio/wav'}
+headers = {
+	'content-type': 'audio/wav',
+}
 
 #TODO
 #have global variable here that will hold the index of the video
@@ -18,27 +21,7 @@ headers={'content-type': 'audio/wav'}
 # Create your views here.
 
 def index(request):
-    link = request.GET.get('link')
-    print(link)
-    print('attempting to get youtube video')
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': '/home/sallese/chrome-extension-MBN/testing.wav',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'wav',
-            'preferredquality': '192',
-        }],
-    }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([link])
-    audio = open('/home/sallese/chrome-extension-MBN/eric.wav', 'rb')
-    print("sending video to watson")
-    r = requests.post(url, auth=(username, password), headers=headers, data=audio)
-    jsonObject = r.json()
-    text = jsonObject['results'][0]['alternatives'][0]['transcript']
-    print(text)
-    return HttpResponse(str(text))
+    return HttpResponse("Index for video_process")
 
 
 def check_index(request):
@@ -51,7 +34,39 @@ def check_index(request):
     
     #TODO
     #When this function is called the global index variable should be cleared and updated
-    
+
+    #check the DB for link coming from front end (don't know yet how we're getting the link)
+
+    #if link in DB return true
+
+    #else download video, pass to watson, and index:
+    link = request.GET.get('link')
+    print(link)
+    print('attempting to get youtube video')
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        # 'outtmpl': "/tmp/temp",
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'wav',
+            'preferredquality': '192',
+        }],
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([link])
+
+    #Stupid youtube-dl made me do this
+    for filename in os.listdir("."):
+    	if filename.endswith(".wav"):
+    		os.rename(filename, "temp.wav")
+
+    audio = open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
+    r = requests.post(url, auth=(username, password), headers=headers, data=audio)
+    jsonObject = r.json()
+    print(jsonObject)
+    text = jsonObject['results'][0]['alternatives'][0]['transcript']
+    print(text)
+    os.remove('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
     return HttpResponse(True)
 
 def process_search_term(request):
