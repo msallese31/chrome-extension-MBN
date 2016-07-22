@@ -1,18 +1,19 @@
 from __future__ import unicode_literals
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 import youtube_dl
 import requests
 import wave
 import os
 
-url = 'https://stream.watsonplatform.net/speech-to-text/api/v1/recognize?continuous=true'
+url = 'https://stream.watsonplatform.net/speech-to-text/api/v1/recognize?continuous=true&timestamps=true'
 username = '040c9c9a-791a-4a22-9989-d1c891148d96'
 password = 'NNmNJPOAqdsU'
 
 headers = {
-	'content-type': 'audio/wav',
+    'content-type': 'audio/wav',
+        'timestamps': 'true'
 }
 
 #TODO
@@ -57,17 +58,25 @@ def check_index(request):
 
     #Stupid youtube-dl made me do this
     for filename in os.listdir("."):
-    	if filename.endswith(".wav"):
-    		os.rename(filename, "temp.wav")
+        if filename.endswith(".wav"):
+            os.rename(filename, "temp.wav")
 
-    audio = open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
+    audio = open('/home/tengen/Documents/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
     r = requests.post(url, auth=(username, password), headers=headers, data=audio)
     jsonObject = r.json()
     print(jsonObject)
-    text = jsonObject['results'][0]['alternatives'][0]['transcript']
-    print(text)
-    os.remove('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
-    return HttpResponse(True)
+    # text = jsonObject['results'][0]['alternatives'][0]['transcript']
+    # print(text)
+#    for text in jsonObject['results'][0]['alternatives'][0]['timestamps']:
+ #       print(text)
+    w = []
+    for text in jsonObject['results']:
+        for words in text['alternatives'][0]['timestamps']:
+            w.append(words)
+    print(w)
+    #words_with_index = jsonObject['results'][0]['alternatives'][0]['timestamps']
+    os.remove('/home/tengen/Documents/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
+    return HttpResponse(json.dumps(w), content_type="application/json")
 
 def process_search_term(request):
     #This function should be called when /video_process/processSearchTerm is hit
