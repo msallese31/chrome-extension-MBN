@@ -14,11 +14,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	    /*sendResponse({farewell: "goodbye"});*/
 	} else if (request.greeting == "responseArray") {
 		console.log(request.data);
+		processResponseArray(request.data);
 		sendResponse({farewell: "response array obtained"});
 	} else {
 		console.log("no valid matches");
 	}
 });
+
+function processResponseArray(array) {
+	console.log("got the data, here it is");
+	console.log(array);
+}
 
 function sendAJAX(url) {
 	console.log("Sending ajax");
