@@ -61,7 +61,7 @@ def check_index(request):
         if filename.endswith(".wav"):
             os.rename(filename, "temp.wav")
 
-    audio = open('/home/tengen/Documents/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
+    audio = open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
     r = requests.post(url, auth=(username, password), headers=headers, data=audio)
     jsonObject = r.json()
     print(jsonObject)
@@ -75,7 +75,7 @@ def check_index(request):
             w.append(words)
     print(w)
     #words_with_index = jsonObject['results'][0]['alternatives'][0]['timestamps']
-    os.remove('/home/tengen/Documents/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
+    os.remove('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
     return HttpResponse(json.dumps(w), content_type="application/json")
 
 def process_search_term(request):
