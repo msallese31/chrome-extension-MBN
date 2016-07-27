@@ -27,11 +27,12 @@
       -
       - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
      -->
-    <script src="background.js"></script>
+    <script src="popup.js"></script>
   </head>
   <body>
-    <div id="status"></div>
-    <img id="image-result" hidden>
+    <input id="queryInput"></input>
+    <input type="button" id="querySubmit" value="Submit"></input>
+    <div id="results"></div>
   </body>
 </html>
 

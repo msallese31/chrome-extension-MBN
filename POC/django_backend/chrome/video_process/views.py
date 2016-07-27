@@ -12,7 +12,7 @@ username = '040c9c9a-791a-4a22-9989-d1c891148d96'
 password = 'NNmNJPOAqdsU'
 
 headers = {
-	'content-type': 'audio/wav',
+    'content-type': 'audio/wav',
         'timestamps': 'true'
 }
 
@@ -58,8 +58,8 @@ def check_index(request):
 
     #Stupid youtube-dl made me do this
     for filename in os.listdir("."):
-    	if filename.endswith(".wav"):
-    		os.rename(filename, "temp.wav")
+        if filename.endswith(".wav"):
+            os.rename(filename, "temp.wav")
 
     audio = open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'rb')
     r = requests.post(url, auth=(username, password), headers=headers, data=audio)
@@ -72,7 +72,7 @@ def check_index(request):
     w = []
     for text in jsonObject['results']:
         for words in text['alternatives'][0]['timestamps']:
-			w.append(words)
+            w.append(words)
     print(w)
     #words_with_index = jsonObject['results'][0]['alternatives'][0]['timestamps']
     os.remove('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
