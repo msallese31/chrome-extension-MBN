@@ -280,19 +280,28 @@ def check_index(request):
 
 def process_search_term(request):
 	w = []
-
-	for i in range(num_txt_files):
+	words = []
+	for i in range(7):
 		with open('speech-to-text-websockets-python/output/%d.json.txt' % i) as f:
 			content = f.readlines()
 			for index, d in enumerate(content):
 				current_line = content[index].split()
 				current_line.append(i*2)
+				words.append(current_line[0])
 				w.append(current_line)
 
 	path = request.get_full_path()
 
+	print(w)
+
 	result = re.findall(r'w[0-9]=(.*?)&',path)
 	print(result)
+
+	for searchT in result:
+		if(searchT in s for index, s in enumerate(words)):
+			print(searchT)
+			print w[index]
+
 
 	words = []
 	words.append(request.GET.get('w1'))
