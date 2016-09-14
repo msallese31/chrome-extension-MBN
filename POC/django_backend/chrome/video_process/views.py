@@ -48,7 +48,6 @@ def index(request):
 def cleanup():
 	os.system('rm temp.wav || true;rm speech-to-text-websockets-python/recordings/*.wav || true;rm speech-to-text-websockets-python/output/*.txt || true;rm speech-to-text-websockets-python/recordings.txt || true')
 
-
 def split_wav(split_start, split_end, file_index):
 	print("splitting")
 	input_file = wave.open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'r')
