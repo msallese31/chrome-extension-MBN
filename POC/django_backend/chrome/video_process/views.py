@@ -48,18 +48,28 @@ def index(request):
 def cleanup():
 	os.system('rm temp.wav || true;rm speech-to-text-websockets-python/recordings/*.wav || true;rm speech-to-text-websockets-python/output/*.txt || true;rm speech-to-text-websockets-python/recordings.txt || true')
 
-def split_wav(split_start, split_end, file_index):
+def write_recording(file_name):
+	print("writing to recordings.txt")
+	if(file_name == 0):
+		with open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings.txt", "w") as myfile:
+			myfile.write(str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(file_name) + ".wav\n")
+	else:
+		with open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings.txt", "a") as myfile:
+			myfile.write(str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(file_name) + ".wav\n")		
+
+
+def crop_wav(split_start, split_end, input_file_name, output_file_name):
 	print("splitting")
-	input_file = wave.open('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav', 'r')
+	input_file = wave.open(input_file_name, 'r')
 	width = input_file.getsampwidth()
 	rate = input_file.getframerate()
 	fpms = rate / 1000 # frames per ms
 	#programmatically figure out start and end split
 	length = (split_end - split_start) * fpms
 	start_index = split_start * fpms
-	path = str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(file_index) + ".wav"
+	
 	# os.mkdir(path)
-	output_file = wave.open(path, "w")
+	output_file = wave.open(output_file_name, "w")
 	output_file.setparams((input_file.getnchannels(), width, rate, length, input_file.getcomptype(), input_file.getcompname()))
 	
 	input_file.rewind()
@@ -69,42 +79,6 @@ def split_wav(split_start, split_end, file_index):
 	input_file.close()
 	output_file.close()
 	print("finished split")
-	print("writing to recordings.txt")
-	if(file_index == 0):
-		print(file_index)
-		with open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings.txt", "w") as myfile:
-			myfile.write(str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(file_index) + ".wav\n")
-	else:
-		print(file_index)
-		with open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings.txt", "a") as myfile:
-			myfile.write(str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(file_index) + ".wav\n")		
-
-
-def multi_thread(num_threads):
-	threads = []
-	for i in range(num_threads):
-		# p = Process(target=watson_request, args=(i,))
-		p = Process(target=test_wat, args=(i,))
-		p.start()
-		# threads.append(p)
-	print("ALL THREADS STARTED AT")
-	print(datetime.datetime.now())
-
-def do_something(response, **kwargs):
-	print(response)
-
-def greqs(num_threads):
-	async_list = []
-	for i in range(num_threads):
-		audio = open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/%d.wav" % i, 'rb')
-		req = grequests.post(url, auth=(username, password), headers=headers, data=audio, hooks = {'response' : do_something})
-		print(req.kwargs)
-		async_list.append(req)
-	response = grequests.map(async_list)
-	print(response.json)
-
-
-
 
 def get_wav_length(file):
 	wave_file = wave.open(file, 'r')
@@ -113,26 +87,12 @@ def get_wav_length(file):
 	duration = frames / float(rate)
 	return duration
 
-# def copy_sockets_solution(threads):
-# 	q = Queue.Queue()
-# 	for i in range(threads):
-
-
-
-
-
 def get_split_times(total_length):
 	#total_length is the total length of the video in seconds
 	#num_pieces IS THE NUMBER OF 2 MINUTE PIECES
 	num_pieces = total_length / 120
 	print(num_pieces)
-	
-	#piece_length IS THE LENGTH OF THE PIECES THEMSELVES
-	if(num_pieces <= 400):
-		piece_length = 120
-	else:
-		num_pieces = 400
-		piece_length = total_length / num_pieces
+	piece_length = 120
 	splits = []
 	start_time = 0.0
 	for i in range(0, int(num_pieces)):
@@ -146,25 +106,6 @@ def get_split_times(total_length):
 	print(splits)
 	print(len(splits))
 	return splits
-	#piece_length WILL ALWAYS BE 120 SECONDS UNLESS A VIDEO 
-	#GOES PAST 50 PIECES (WHICH MEANS IT WOULD REQUIRE > 50 THREADS).
-	#50 IS A MADE UP NUMBER RIGHT NOW BUT THERE MUST BE SOME SAFE
-	#NUMBER OF THREADS TO USE
-
-def check_urls(req_num):
-
-	def fetch(file_index):
-		print("fetching req# %d" %i)
-		audio = open("/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/%d.wav" % file_index, 'rb')
-		response = requests.post(url, auth=(username, password), headers=headers, data=audio)
-		print "Status: [%s] URL: %s" % (response.status_code, url)
-		print(datetime.datetime.now())
-
-	pool = Pool(req_num)
-	for i in range(req_num):
-		pool.spawn(fetch, i)
-	pool.join()
-
 
 def watson_request(file_index):
 	print ("Openening: /home/sallese/chrome-extension-MBN/POC/django_backend/chrome/%d.wav" % file_index)
@@ -173,13 +114,7 @@ def watson_request(file_index):
 	fileMutex.release()
 	print("About to call %d.wav request" % file_index)
 	r = requests.post(url, auth=(username, password), headers=headers, data=audio)
-	# print("%d.wav request finished" % file_index) 
 	jsonObject = r.json()
-	# print(jsonObject)
-	# text = jsonObject['results'][0]['alternatives'][0]['transcript']
-	# print(text)
-#    for text in jsonObject['results'][0]['alternatives'][0]['timestamps']:
- #       print(text)
 	mutex.acquire()
 	for text in jsonObject['results']:
 		for words in text['alternatives'][0]['timestamps']:
@@ -188,32 +123,8 @@ def watson_request(file_index):
 	print(words[-1])
 	print("Request number %d is done with mutex" % file_index)
 	print(datetime.datetime.now())
-	# print(w)
 
-def dummy_threading_function(i):
-	print "thread %d sleeps for 2 seconds" % i
-	sleep(5)
-	print "thread %d woke up" % i
-
-def check_index(request):
-	#This function should be called when /video_process/checkindex is hit.
-	#It should do the following:
-	####check the db if the link sent is in the db of indexes
-	####if the link is in the index db it should return true
-	####if not it should download the video, index it, and then return true
-	####if the video can't be indexed it should return false
-	
-	#TODO
-	#When this function is called the global index variable should be cleared and updated
-
-	#check the DB for link coming from front end (don't know yet how we're getting the link)
-
-	#if link in DB return true
-
-	#else download video, pass to watson, and index:
-	cleanup()
-	link = request.GET.get('link')
-	print(link)
+def download_yt(link):
 	print('attempting to get youtube video')
 	ydl_opts = {
 		'format': 'bestaudio/best',
@@ -229,45 +140,77 @@ def check_index(request):
 	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 		ydl.download([link])
 
+def rename_wav(where, rename_to):
+	for filename in os.listdir(where):
+		if filename.endswith(".wav"):
+			os.rename(filename, rename_to)
+
+
+def check_index(request):
+	#This function should be called when /video_process/checkindex is hit.
+	#It should do the following:
+	####check the db if the link sent is in the db of indexes
+	####if the link is in the index db it should return the list to the extension
+	####if not it should download the video, index it, and then return the list
+	####if the video can't be indexed it should return error
+
+	#check the DB for link coming from front end
+
+	#if link in DB return true
+
+	#else download video, pass to watson, and index:
+	cleanup()
+	link = request.GET.get('link')
+	print(link)
+	download_yt(link)
 	print(datetime.datetime.now())
 
-	#Stupid youtube-dl made me do this
-	for filename in os.listdir("."):
-		if filename.endswith(".wav"):
-			os.rename(filename, "temp.wav")
+	#Rename wav file to a nicer name
+	rename_wav(".", "temp.wav")
 	wav_length = get_wav_length('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
 	print(wav_length)
 	#Get the split times
 	splits = get_split_times(wav_length)
 	#Split the wav into pieces
+	input_path = '/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav'
+
 	for i, split in enumerate(splits):
-		split_wav(int(split[0]), int(split[1]), i)
+		output_path = str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(i) + ".wav"
+		crop_wav(int(split[0]), int(split[1]), input_path, output_path)
+		write_recording(i)
 
 	print(datetime.datetime.now())
 	num_threads = len(splits)
 	print("NUMBER OF SPLITS")
 	print(num_threads)
 
-	num_threads = num_threads
-
+	#write to file for info about watson call
 	now = str(datetime.datetime.now()).replace(" ","")
 	f = open('info-%s.txt' % now, 'a')
-
 	now = str(datetime.datetime.now()).replace(" ","")
 	f.write("Called Watson at: %s" % now + "\n")
 	
+	#Call to sttClient for multithreading
+	#TODO implement multithreading in a function instead
 	os.system('python speech-to-text-websockets-python/sttClient.py -credentials 040c9c9a-791a-4a22-9989-d1c891148d96:NNmNJPOAqdsU -model en-US_BroadbandModel -threads %d' % num_threads)
-	#words_with_index = jsonObject['results'][0]['alternatives'][0]['timestamps']
+	
 	now = str(datetime.datetime.now()).replace(" ","")
 	f.write("Finished Watson at: %s" % now + "\n")
 	f.write("num_threads = %d" % num_threads + "\n")
 	f.write("number of splits = %d" % len(splits) + "\n")
+	for s in splits:
+		f.write(str(s) + '\n')
 	f.close()
 
+	#This block is appending all of the text in the output files to w
+	#w is then sent to the extension
+	#w should contain a list of lists ex: 
+	#[["monster", "1.09", "1.23", 0], ["maybe", "1.23", "1.46", 0]]
+	#The format is:
+	#[word, seconds where the word starts, seconds where the word ends, minute where the word occurs]
+	#youtube.com/watch?v=blahblah#t=0m1.09s would be the beginning of the word "monster" 
 	num_txt_files = len(splits) - 1
-
 	w = []
-
 	for i in range(num_txt_files):
 		with open('speech-to-text-websockets-python/output/%d.json.txt' % i) as f:
 			content = f.readlines()
