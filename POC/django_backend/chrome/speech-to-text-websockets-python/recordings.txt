@@ -1,9 +1,3 @@
 /home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/0.wav
 /home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/1.wav
 /home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/2.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/3.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/4.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/5.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/6.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/7.wav
-/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/8.wav

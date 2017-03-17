@@ -159,48 +159,48 @@ def check_index(request):
 	#if link in DB return true
 
 	#else download video, pass to watson, and index:
-	cleanup()
-	link = request.GET.get('link')
-	print(link)
-	download_yt(link)
-	print(datetime.datetime.now())
+	# cleanup()
+	# link = request.GET.get('link')
+	# print(link)
+	# download_yt(link)
+	# print(datetime.datetime.now())
 
-	#Rename wav file to a nicer name
-	rename_wav(".", "temp.wav")
+	# #Rename wav file to a nicer name
+	# rename_wav(".", "temp.wav")
 	wav_length = get_wav_length('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav')
-	print(wav_length)
-	#Get the split times
+	# print(wav_length)
+	# #Get the split times
 	splits = get_split_times(wav_length)
-	#Split the wav into pieces
-	input_path = '/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav'
+	# #Split the wav into pieces
+	# input_path = '/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/temp.wav'
 
-	for i, split in enumerate(splits):
-		output_path = str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(i) + ".wav"
-		crop_wav(int(split[0]), int(split[1]), input_path, output_path)
-		write_recording(i)
+	# for i, split in enumerate(splits):
+	# 	output_path = str('/home/sallese/chrome-extension-MBN/POC/django_backend/chrome/speech-to-text-websockets-python/recordings/') + str(i) + ".wav"
+	# 	crop_wav(int(split[0]), int(split[1]), input_path, output_path)
+	# 	write_recording(i)
 
-	print(datetime.datetime.now())
-	num_threads = len(splits)
-	print("NUMBER OF SPLITS")
-	print(num_threads)
+	# print(datetime.datetime.now())
+	# num_threads = len(splits)
+	# print("NUMBER OF SPLITS")
+	# print(num_threads)
 
-	#write to file for info about watson call
-	now = str(datetime.datetime.now()).replace(" ","")
-	f = open('info-%s.txt' % now, 'a')
-	now = str(datetime.datetime.now()).replace(" ","")
-	f.write("Called Watson at: %s" % now + "\n")
+	# #write to file for info about watson call
+	# now = str(datetime.datetime.now()).replace(" ","")
+	# f = open('info-%s.txt' % now, 'a')
+	# now = str(datetime.datetime.now()).replace(" ","")
+	# f.write("Called Watson at: %s" % now + "\n")
 	
-	#Call to sttClient for multithreading
-	#TODO implement multithreading in a function instead
-	os.system('python speech-to-text-websockets-python/sttClient.py -credentials 040c9c9a-791a-4a22-9989-d1c891148d96:NNmNJPOAqdsU -model en-US_BroadbandModel -threads %d' % num_threads)
+	# #Call to sttClient for multithreading
+	# #TODO implement multithreading in a function instead
+	# os.system('python speech-to-text-websockets-python/sttClient.py -credentials 040c9c9a-791a-4a22-9989-d1c891148d96:NNmNJPOAqdsU -model en-US_BroadbandModel -threads %d' % num_threads)
 	
-	now = str(datetime.datetime.now()).replace(" ","")
-	f.write("Finished Watson at: %s" % now + "\n")
-	f.write("num_threads = %d" % num_threads + "\n")
-	f.write("number of splits = %d" % len(splits) + "\n")
-	for s in splits:
-		f.write(str(s) + '\n')
-	f.close()
+	# now = str(datetime.datetime.now()).replace(" ","")
+	# f.write("Finished Watson at: %s" % now + "\n")
+	# f.write("num_threads = %d" % num_threads + "\n")
+	# f.write("number of splits = %d" % len(splits) + "\n")
+	# for s in splits:
+	# 	f.write(str(s) + '\n')
+	# f.close()
 
 	#This block is appending all of the text in the output files to w
 	#w is then sent to the extension
